@@ -1,30 +1,28 @@
 name: Publish
 
-# Publishes to npm when a GitHub Release is published. The release tag should
-# match the version in package.json (e.g. tag `v0.1.0`).
 on:
-  release:
-    types: [published]
+  push:
+    tags:
+      - "v*.*.*"
 
 permissions:
   contents: read
-  id-token: write # required for npm provenance
+  id-token: write
 
 jobs:
   publish:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
-          node-version: 20
+          node-version: '24.x'
           registry-url: 'https://registry.npmjs.org'
-          cache: npm
+          package-manager-cache: false
       - run: npm ci
       - run: npm run typecheck
       - run: npm run build
       - run: npm test
-      # `prepublishOnly` builds the package; publishConfig sets public access + provenance.
-      - run: npm publish
+      - run: npm publish --provenance --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
