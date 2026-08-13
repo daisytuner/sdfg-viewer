@@ -1,24 +1,16 @@
 # @daisytuner/sdfg-viewer
 
-Interactive canvas renderer for **docc Structured SDFG JSON**. Extracted from the
-Daisytuner dashboard so the same viewer can be embedded in the docs site,
-marketing pages, or any other React surface — one source of truth.
+Interactive canvas renderer for **docc Structured SDFG JSON**. It powers the
+Daisytuner dashboard and docs, and can be embedded in any React surface — one
+source of truth for SDFG rendering.
 
 ## Install
 
-Not published to a registry yet. Consume it locally via a path dependency:
-
-```jsonc
-// package.json
-{
-  "dependencies": {
-    "@daisytuner/sdfg-viewer": "file:../sdfg-viewer"
-  }
-}
+```bash
+npm install @daisytuner/sdfg-viewer
 ```
 
-Then build the package once (`npm run build`) so `dist/` exists before installing
-in the consumer.
+`react` and `react-dom` (v18 or v19) are peer dependencies.
 
 ## Usage
 

@@ -1,8 +1,27 @@
 {
   "name": "@daisytuner/sdfg-viewer",
   "version": "0.1.0",
-  "description": "Interactive canvas renderer for docc Structured SDFG JSON. Shared by the Daisytuner dashboard and docs.",
-  "license": "UNLICENSED",
+  "description": "Interactive canvas renderer for docc Structured SDFG JSON.",
+  "license": "MIT",
+  "author": "Daisytuner",
+  "homepage": "https://github.com/daisytuner/sdfg-viewer#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/daisytuner/sdfg-viewer.git"
+  },
+  "bugs": {
+    "url": "https://github.com/daisytuner/sdfg-viewer/issues"
+  },
+  "keywords": [
+    "sdfg",
+    "docc",
+    "daisytuner",
+    "compiler",
+    "visualization",
+    "canvas",
+    "react",
+    "dataflow"
+  ],
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -16,13 +35,26 @@
   },
   "files": [
     "dist",
-    "src"
+    "src",
+    "README.md",
+    "LICENSE"
   ],
   "sideEffects": false,
+  "engines": {
+    "node": ">=18"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "coverage": "vitest run --coverage",
+    "prepublishOnly": "npm run build"
   },
   "peerDependencies": {
     "react": ">=18",
@@ -36,9 +68,11 @@
     "@types/dagre": "^0.7.54",
     "@types/react": "^19.0.8",
     "@types/react-dom": "^19.0.3",
+    "@vitest/coverage-v8": "^2.1.8",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "tsup": "^8.3.5",
-    "typescript": "~5.7.2"
+    "typescript": "~5.7.2",
+    "vitest": "^2.1.8"
   }
 }
