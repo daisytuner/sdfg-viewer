@@ -1,0 +1,44 @@
+{
+  "name": "@daisytuner/sdfg-viewer",
+  "version": "0.1.0",
+  "description": "Interactive canvas renderer for docc Structured SDFG JSON. Shared by the Daisytuner dashboard and docs.",
+  "license": "UNLICENSED",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit"
+  },
+  "peerDependencies": {
+    "react": ">=18",
+    "react-dom": ">=18"
+  },
+  "dependencies": {
+    "dagre": "^0.8.5",
+    "lucide-react": "^0.475.0"
+  },
+  "devDependencies": {
+    "@types/dagre": "^0.7.54",
+    "@types/react": "^19.0.8",
+    "@types/react-dom": "^19.0.3",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "tsup": "^8.3.5",
+    "typescript": "~5.7.2"
+  }
+}
