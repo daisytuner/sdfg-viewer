@@ -19,6 +19,20 @@ export type SdfgRegionAnnotation = {
   bottleneck?: string
 }
 
+/** Color scheme of a highlight. */
+export type SdfgHighlightTone = 'success' | 'info' | 'warning' | 'danger' | 'muted'
+
+/**
+ * An always-visible marker on one element (e.g. which loop nests were optimized), drawn on
+ * top of the graph independently of the overlay dropdown.
+ */
+export type SdfgHighlight = {
+  element_id: number
+  tone?: SdfgHighlightTone
+  /** Short text shown as a pill in the element's bottom-left corner, e.g. "1.8×". */
+  label?: string
+}
+
 /** Which per-region information to overlay on the SDFG (none = plain graph). */
 export type OverlayMode = 'none' | 'runtime' | 'bottleneck'
 

@@ -35,7 +35,9 @@ The parent must have a resolved height — the canvas fills its container.
 | ------------------- | --------------------------------------------- | ------------------------------------------------------- |
 | `doc`               | `StructuredSdfg`                              | docc structured JSON (must have a top-level `root`).     |
 | `regions`           | `SdfgRegionAnnotation[]`                      | Per-region runtime/bottleneck data, keyed by element_id. |
+| `highlights`        | `SdfgHighlight[]`                             | Always-on markers `{ element_id, tone?, label? }`; tones `success`, `info`, `warning`, `danger`, `muted`. |
 | `selectedElementId` | `number`                                      | Highlighted element.                                     |
+| `focusSelected`     | `boolean` (default `false`)                   | Pan and zoom to `selectedElementId` when it changes.     |
 | `onSelectRegion`    | `(elementId: number) => void`                | Fired when a region container is clicked.                |
 | `onSelectElement`   | `(elementId: number, kind: string) => void`  | Fired when any element is clicked.                       |
 | `onDeselect`        | `() => void`                                  | Fired when empty canvas is clicked.                      |

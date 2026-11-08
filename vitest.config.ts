@@ -6,7 +6,7 @@ export default defineConfig({
     environment: 'node',
     coverage: {
       provider: 'v8',
-      include: ['src/layout.ts', 'src/types.ts'],
+      include: ['src/layout.ts', 'src/types.ts', 'src/highlights.ts'],
     },
   },
 })

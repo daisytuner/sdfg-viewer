@@ -10,7 +10,8 @@ import {
 } from 'lucide-react'
 import { layoutSdfg, FONT } from './layout'
 import type { LaidNode, LaidNodeKind, SdfgLayout } from './layout'
-import type { OverlayMode, SdfgRegionAnnotation, StructuredSdfg } from './types'
+import type { OverlayMode, SdfgHighlight, SdfgRegionAnnotation, StructuredSdfg } from './types'
+import { resolveHighlights } from './highlights'
 
 const MIN_SCALE = 0.05
 const MAX_SCALE = 8
@@ -56,7 +57,9 @@ type View = { scale: number; x: number; y: number }
 export const SdfgCanvas = ({
   doc,
   regions,
+  highlights,
   selectedElementId,
+  focusSelected = false,
   onSelectRegion,
   onSelectElement,
   onDeselect,
@@ -64,7 +67,11 @@ export const SdfgCanvas = ({
 }: {
   doc: StructuredSdfg
   regions?: SdfgRegionAnnotation[]
+  /** Always-visible element markers (tone + label), independent of the overlay dropdown. */
+  highlights?: SdfgHighlight[]
   selectedElementId?: number
+  /** Pan and zoom to `selectedElementId` whenever it changes. */
+  focusSelected?: boolean
   onSelectRegion?: (elementId: number) => void
   onSelectElement?: (elementId: number, kind: string) => void
   onDeselect?: () => void
@@ -160,6 +167,7 @@ export const SdfgCanvas = ({
     () => Math.max(1, ...(regions ?? []).map((r) => r.runtime_us)),
     [regions],
   )
+  const highlightById = useMemo(() => resolveHighlights(highlights), [highlights])
 
   // Minimap axis scales (independent so the box is always fully filled).
   const minimap = useMemo(() => {
@@ -213,6 +221,13 @@ export const SdfgCanvas = ({
     const cy = n.y + n.h / 2
     setView({ scale, x: cw / 2 - cx * scale, y: ch / 2 - cy * scale })
   }, [])
+
+  // Optionally follow the selection, e.g. when it is driven from a list next to the canvas.
+  useEffect(() => {
+    if (!focusSelected || selectedElementId == null) return
+    const n = byId.get(selectedElementId)
+    if (n) focusNode(n)
+  }, [focusSelected, selectedElementId, byId, focusNode])
 
   // Jump to the current search hit whenever it changes.
   useEffect(() => {
@@ -312,6 +327,35 @@ export const SdfgCanvas = ({
       }
     }
 
+    // 2b) Highlights: tinted fill + outline + corner label, always on.
+    if (highlightById.size) {
+      ctx.font = `bold ${FONT}px ui-monospace, monospace`
+      for (const n of layout.nodes) {
+        const h = highlightById.get(n.id)
+        if (!h || !visible(n)) continue
+        ctx.fillStyle = h.style.fill
+        ctx.strokeStyle = h.style.stroke
+        ctx.lineWidth = 2 / scale
+        roundRect(ctx, n.x, n.y, n.w, n.h, 6)
+        ctx.fill()
+        ctx.stroke()
+        if (h.label) {
+          // Filled pill in the bottom-left corner: wide loops often extend past the viewport's
+          // right edge, while their left edge stays visible.
+          const text = clip(h.label, n.w - 20)
+          const tw = ctx.measureText(text).width
+          const ph = FONT + 6
+          const py = n.y + n.h - ph - 4
+          ctx.fillStyle = h.style.stroke
+          roundRect(ctx, n.x + 4, py, tw + 10, ph, ph / 2)
+          ctx.fill()
+          ctx.fillStyle = '#ffffff'
+          ctx.fillText(text, n.x + 9, py + ph / 2)
+        }
+      }
+      ctx.font = `${FONT}px ui-monospace, monospace`
+    }
+
     // 3) Memlet edges.
     ctx.strokeStyle = '#94a3b8'
     ctx.lineWidth = lw
@@ -402,7 +446,7 @@ export const SdfgCanvas = ({
         ctx.stroke()
       }
     }
-  }, [layout, view, byId, annById, maxUs, hoverId, selectedElementId, overlay, matchIds, currentMatch])
+  }, [layout, view, byId, annById, maxUs, highlightById, hoverId, selectedElementId, overlay, matchIds, currentMatch])
 
   useEffect(() => {
     const id = requestAnimationFrame(draw)
@@ -445,6 +489,14 @@ export const SdfgCanvas = ({
         ctx.fillRect(n.x, n.y, n.w, n.h)
       }
     }
+    for (const n of layout.nodes) {
+      const h = highlightById.get(n.id)
+      if (!h) continue
+      ctx.fillStyle = h.style.stroke
+      ctx.globalAlpha = 0.6
+      ctx.fillRect(n.x, n.y, n.w, n.h)
+      ctx.globalAlpha = 1
+    }
     ctx.restore()
 
     // Current viewport rectangle.
@@ -457,7 +509,7 @@ export const SdfgCanvas = ({
     ctx.strokeStyle = '#0f172a'
     ctx.lineWidth = 1.5
     ctx.strokeRect(vwx * sx, vwy * sy, vww * sx, vwh * sy)
-  }, [layout, minimap, view, annById, maxUs, overlay])
+  }, [layout, minimap, view, annById, maxUs, overlay, highlightById])
   useEffect(() => {
     const id = requestAnimationFrame(drawMinimap)
     return () => cancelAnimationFrame(id)
