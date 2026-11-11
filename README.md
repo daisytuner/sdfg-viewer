@@ -42,6 +42,7 @@ The parent must have a resolved height — the canvas fills its container.
 | `onSelectElement`   | `(elementId: number, kind: string) => void`  | Fired when any element is clicked.                       |
 | `onDeselect`        | `() => void`                                  | Fired when empty canvas is clicked.                      |
 | `controls`          | `boolean` (default `true`)                    | Show overlay dropdown, search, minimap and zoom.         |
+| `initialView`       | `'top' \| 'fit'` (default `'top'`)           | Framing of a newly shown graph: zoom into its top, or fit the whole graph. |
 
 ## Styling
 

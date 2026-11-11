@@ -64,6 +64,7 @@ export const SdfgCanvas = ({
   onSelectElement,
   onDeselect,
   controls = true,
+  initialView = 'top',
 }: {
   doc: StructuredSdfg
   regions?: SdfgRegionAnnotation[]
@@ -77,6 +78,11 @@ export const SdfgCanvas = ({
   onDeselect?: () => void
   /** Show the overlay dropdown + minimap. Off for small region cutouts. */
   controls?: boolean
+  /**
+   * How a newly shown graph is framed: `top` zooms into its first elements, `fit` shows the whole
+   * graph (e.g. for small previews).
+   */
+  initialView?: 'top' | 'fit'
 }) => {
   const containerRef = useRef<HTMLDivElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -188,9 +194,13 @@ export const SdfgCanvas = ({
     })
   }, [layout])
 
-  // Default: zoom into the top of the graph so the first elements fill ~half the
-  // width. The whole-graph "fit" view lives in the minimap instead.
-  const initialView = useCallback(() => {
+  // `top` (default): zoom into the top of the graph so the first elements fill ~80% of the width;
+  // the whole-graph view lives in the minimap. `fit`: show the whole graph.
+  const frameInitially = useCallback(() => {
+    if (initialView === 'fit') {
+      fit()
+      return
+    }
     const el = containerRef.current
     if (!el || !layout) return
     const cw = el.clientWidth
@@ -201,11 +211,11 @@ export const SdfgCanvas = ({
       Math.max(fitScale, (cw * 0.8) / layout.width),
     )
     setView({ scale, x: (cw - layout.width * scale) / 2, y: 16 })
-  }, [layout])
+  }, [layout, initialView, fit])
 
   useEffect(() => {
-    initialView()
-  }, [initialView])
+    frameInitially()
+  }, [frameInitially])
 
   // Center the view on a node and zoom it to a comfortable, readable size.
   const focusNode = useCallback((n: LaidNode) => {
